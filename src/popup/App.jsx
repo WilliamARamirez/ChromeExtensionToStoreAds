@@ -1,5 +1,10 @@
 function App() {
-  return <div className="bg-red-500 w-20 h-20">this is a test.</div>;
+  return (
+    <div>
+      This extension rquires you to navigate to facebook.com's library and
+      login.
+    </div>
+  );
 }
 
 export default App;
