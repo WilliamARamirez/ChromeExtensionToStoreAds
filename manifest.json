@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "AdScrapingChromeExtension",
+  "version": "1.0.0",
+  "action": { "default_popup": "index.html" },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "host_permissions": ["*://www.facebook.com/*", "https://www.facebook.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting",
+    "webRequest",
+    "cookies",
+    "sidePanel"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
