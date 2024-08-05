@@ -7,7 +7,7 @@ export default defineConfig(() => ({
   plugins: [react(), crx({ manifest })],
   build: {
     rollupOptions: {
-      input: ["index.html", "sidepanel.html", "background.js"],
+      input: ["index.html", "sidepanel.html", "background.js", "content.js"],
     },
   },
 }));

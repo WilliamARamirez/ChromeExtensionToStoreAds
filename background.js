@@ -34,27 +34,35 @@ chrome.webRequest.onBeforeRequest.addListener(
     if (details.method === "POST") {
       const url = details.url;
       const queryParams = getQueryParams(url);
-      const formData = details.requestBody.formData;
-
-      chrome.cookies.getAll({ url: "https://www.facebook.com" }, (cookies) => {
-        console.log(cookies);
-        chrome.storage.local.set({ cookies }, () => {
-          console.log("Stored cookies:", cookies);
-        });
-      });
+      const formData = details.requestBody?.formData ?? {};
 
       // Store query params and form data:",
-      chrome.storage.local.set({ queryParams, formData }, () => {
-        // console.log(
-        //   "Stored query params and form data:",
-        //   formData,
-        //   queryParams
-        // );
+      chrome.storage.local.set(
+        {
+          queryParams: JSON.stringify(queryParams ?? {}),
+          formData: JSON.stringify(formData ?? {}),
+        }
+        // () => {
+        //   console.log(
+        //     "Stored query params and form data:",
+        //     formData,
+        //     queryParams
+        //   );
+        // }
+      );
+
+      chrome.cookies.getAll({ url: "https://www.facebook.com" }, (cookies) => {
+        chrome.storage.local.set(
+          { cookies: JSON.stringify(cookies ?? {}) },
+          () => {
+            // console.log("Stored cookies:", cookies);
+          }
+        );
       });
     }
   },
   {
-    urls: ["*://www.facebook.com/*"],
+    urls: ["https://www.facebook.com/ads/library/async/search_ads/?*"],
   },
   ["requestBody"]
 );
@@ -62,9 +70,16 @@ chrome.webRequest.onBeforeRequest.addListener(
 // Handle messages from the side panel
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "getStoredData") {
-    chrome.storage.local.get(["queryParams", "formData"], (data) => {
+    chrome.storage.local.get(["queryParams", "formData", "cookies"], (data) => {
       sendResponse(data);
     });
     return true; // Keep the messaging channel open for async response
+  }
+});
+
+chrome.webNavigation.onCompleted.addListener(async (details) => {
+  if (details.frameId === 0) {
+    // Ensure it's the main frame
+    chrome.tabs.sendMessage(details.tabId, { action: "updatePanel" });
   }
 });
